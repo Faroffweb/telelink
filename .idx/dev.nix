@@ -22,6 +22,19 @@
         ];
         manager = "web";
       };
+      vite = {
+        command = [
+          "npm"
+          "run"
+          "vite"
+          "--"
+          "--port"
+          "$PORT"
+          "--host"
+          "0.0.0.0"
+        ];
+        manager = "web";
+      };
     };
   };
 }
