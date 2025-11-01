@@ -85,7 +85,7 @@ const PublicPost = () => {
           <div className="flex items-center gap-2">
             <Shield className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              LinkGuard
+              tellelink
             </h1>
           </div>
         </div>
@@ -111,7 +111,7 @@ const PublicPost = () => {
         </Card>
 
         <p className="text-center text-sm text-muted-foreground mt-8">
-          Powered by LinkGuard
+          Powered by tellelink
         </p>
       </div>
     </div>

@@ -16,7 +16,7 @@ const Index = () => {
             <div className="flex items-center justify-center gap-3 mb-6">
               <Shield className="h-16 w-16 text-primary" />
               <h1 className="text-6xl font-bold bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
-                LinkGuard
+                tellelink
               </h1>
             </div>
             
@@ -53,7 +53,7 @@ const Index = () => {
       {/* Features Section */}
       <section className="py-20 px-4 bg-card/50">
         <div className="container mx-auto max-w-6xl">
-          <h3 className="text-3xl font-bold text-center mb-12">Why Choose LinkGuard?</h3>
+          <h3 className="text-3xl font-bold text-center mb-12">Why Choose tellelink?</h3>
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="p-6 rounded-lg bg-card shadow-card space-y-3">
@@ -96,7 +96,7 @@ const Index = () => {
             Ready to Protect Your Links?
           </h3>
           <p className="text-xl text-muted-foreground">
-            Join thousands of users who trust LinkGuard for their link sharing needs.
+            Join thousands of users who trust tellelink for their link sharing needs.
           </p>
           <Button 
             size="lg" 
@@ -111,7 +111,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border py-8 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>© 2025 LinkGuard. All rights reserved.</p>
+          <p>© 2025 tellelink. All rights reserved.</p>
         </div>
       </footer>
     </div>
