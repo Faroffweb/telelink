@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,45 @@ const CreatePostDialog = ({ open, onOpenChange, onPostCreated }: CreatePostDialo
   const [title, setTitle] = useState("");
   const [links, setLinks] = useState<Link[]>([{ button_name: "", url: "" }]);
   const [loading, setLoading] = useState(false);
+  const [linkShortenerEnabled, setLinkShortenerEnabled] = useState(false);
+
+  useEffect(() => {
+    fetchUserSettings();
+  }, []);
+
+  const fetchUserSettings = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: settings } = await supabase
+        .from("user_settings")
+        .select("enable_link_shortener")
+        .eq("user_id", user.id)
+        .single();
+
+      if (settings) {
+        setLinkShortenerEnabled(settings.enable_link_shortener);
+      }
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+    }
+  };
+
+  const shortenLink = async (url: string): Promise<string> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('shorten-link', {
+        body: { url }
+      });
+
+      if (error) throw error;
+
+      return data.shortenedUrl || url;
+    } catch (error) {
+      console.error("Error shortening link:", error);
+      return url; // Return original URL if shortening fails
+    }
+  };
 
   const handleAddLink = () => {
     if (links.length < 20) {
@@ -82,7 +121,17 @@ const CreatePostDialog = ({ open, onOpenChange, onPostCreated }: CreatePostDialo
 
       if (postError) throw postError;
 
-      const linksToInsert = validLinks.map((link, index) => ({
+      // Shorten links if enabled
+      const processedLinks = linkShortenerEnabled
+        ? await Promise.all(
+            validLinks.map(async (link) => ({
+              ...link,
+              url: await shortenLink(link.url),
+            }))
+          )
+        : validLinks;
+
+      const linksToInsert = processedLinks.map((link, index) => ({
         post_id: post.id,
         button_name: link.button_name,
         url: link.url,

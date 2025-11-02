@@ -1,10 +1,14 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -13,19 +17,66 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email.",
   }),
+  enableLinkShortener: z.boolean().default(false),
 });
 
 const Settings = () => {
+  const [loading, setLoading] = useState(true);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       email: "",
+      enableLinkShortener: false,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  useEffect(() => {
+    fetchUserSettings();
+  }, []);
+
+  const fetchUserSettings = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: settings } = await supabase
+        .from("user_settings")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if (settings) {
+        form.setValue("enableLinkShortener", settings.enable_link_shortener);
+      }
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("user_settings")
+        .upsert({
+          user_id: user.id,
+          enable_link_shortener: values.enableLinkShortener,
+        }, {
+          onConflict: "user_id"
+        });
+
+      if (error) throw error;
+
+      toast.success("Settings saved successfully");
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      toast.error("Failed to save settings");
+    }
   }
 
   return (
@@ -64,7 +115,27 @@ const Settings = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Save Changes</Button>
+              <FormField
+                control={form.control}
+                name="enableLinkShortener"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Link Shortener</FormLabel>
+                      <FormDescription>
+                        Automatically shorten links using GPLinks.com when creating posts
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={loading}>Save Changes</Button>
             </form>
           </Form>
         </CardContent>
