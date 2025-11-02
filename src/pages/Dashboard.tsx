@@ -21,36 +21,81 @@ const Dashboard = () => {
 
   return (
     <SidebarProvider>
-      <Sidebar>
-        <div className="flex flex-col h-full bg-muted/40">
-          <div className="p-4 border-b">
-            <div className="flex items-center gap-2">
-                <Shield className="h-8 w-8 text-primary" />
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+      <Sidebar className="border-r bg-gradient-to-b from-background to-muted/20">
+        <div className="flex flex-col h-full">
+          <div className="p-6 border-b bg-card/50 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Shield className="h-6 w-6 text-primary" />
+              </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
                 tellelink
-                </h1>
+              </h1>
             </div>
           </div>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setActiveView("dashboard")} isActive={activeView === "dashboard"}>
-                <LayoutDashboard className="h-5 w-5 mr-3" />
-                <span className="text-lg">Dashboard</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setActiveView("links")} isActive={activeView === "links"}>
-                <LinkIcon className="h-5 w-5 mr-3" />
-                <span className="text-lg">Links</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setActiveView("settings")} isActive={activeView === "settings"}>
-                <SettingsIcon className="h-5 w-5 mr-3" />
-                <span className="text-lg">Settings</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          
+          <div className="flex-1 p-4 space-y-2">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={() => setActiveView("dashboard")} 
+                  isActive={activeView === "dashboard"}
+                  className="group relative overflow-hidden transition-all duration-200"
+                >
+                  <div className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                    activeView === "dashboard" 
+                      ? "bg-primary text-primary-foreground shadow-lg" 
+                      : "hover:bg-muted/50"
+                  }`}>
+                    <LayoutDashboard className="h-5 w-5" />
+                    <span className="font-medium">Dashboard</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={() => setActiveView("links")} 
+                  isActive={activeView === "links"}
+                  className="group relative overflow-hidden transition-all duration-200"
+                >
+                  <div className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                    activeView === "links" 
+                      ? "bg-primary text-primary-foreground shadow-lg" 
+                      : "hover:bg-muted/50"
+                  }`}>
+                    <LinkIcon className="h-5 w-5" />
+                    <span className="font-medium">Links</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={() => setActiveView("settings")} 
+                  isActive={activeView === "settings"}
+                  className="group relative overflow-hidden transition-all duration-200"
+                >
+                  <div className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                    activeView === "settings" 
+                      ? "bg-primary text-primary-foreground shadow-lg" 
+                      : "hover:bg-muted/50"
+                  }`}>
+                    <SettingsIcon className="h-5 w-5" />
+                    <span className="font-medium">Settings</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </div>
+          
+          <div className="p-4 border-t bg-card/30">
+            <div className="p-3 rounded-lg bg-muted/50 border">
+              <p className="text-xs text-muted-foreground text-center">
+                Powered by tellelink
+              </p>
+            </div>
+          </div>
         </div>
       </Sidebar>
       <SidebarInset>
