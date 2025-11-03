@@ -144,7 +144,11 @@ const CreatePostDialog = ({ open, onOpenChange, onPostCreated }: CreatePostDialo
 
       if (linksError) throw linksError;
 
-      toast.success("Post created successfully!");
+      // Copy the post link to clipboard
+      const postUrl = `${window.location.origin}/post/${slug}`;
+      await navigator.clipboard.writeText(postUrl);
+
+      toast.success("Post created and link copied to clipboard!");
       setTitle("");
       setLinks([{ button_name: "", url: "" }]);
       onPostCreated();
@@ -225,7 +229,7 @@ const CreatePostDialog = ({ open, onOpenChange, onPostCreated }: CreatePostDialo
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating..." : "Create Post"}
+            {loading ? "Saving..." : "Save and Copy"}
           </Button>
         </form>
       </DialogContent>
