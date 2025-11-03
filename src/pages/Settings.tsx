@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,13 +11,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email.",
-  }),
   enableLinkShortener: z.boolean().default(false),
+  linkShortenerService: z.enum(["gplinks", "bitly", "tinyurl", "isgd", "cuttly"]),
 });
 
 const Settings = () => {
@@ -25,9 +20,8 @@ const Settings = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
-      email: "",
       enableLinkShortener: false,
+      linkShortenerService: "gplinks",
     },
   });
 
@@ -48,6 +42,7 @@ const Settings = () => {
 
       if (settings) {
         form.setValue("enableLinkShortener", settings.enable_link_shortener);
+        form.setValue("linkShortenerService", settings.link_shortener_service as any);
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -66,6 +61,7 @@ const Settings = () => {
         .upsert({
           user_id: user.id,
           enable_link_shortener: values.enableLinkShortener,
+          link_shortener_service: values.linkShortenerService,
         }, {
           onConflict: "user_id"
         });
@@ -91,40 +87,14 @@ const Settings = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="shadcn" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="shadcn@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="enableLinkShortener"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/50">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Link Shortener</FormLabel>
+                      <FormLabel className="text-base">Enable Link Shortener</FormLabel>
                       <FormDescription>
                         {field.value 
-                          ? "✓ Links will be automatically shortened using GPLinks.com when creating posts" 
+                          ? "✓ Links will be automatically shortened when creating posts" 
                           : "Links will not be shortened and will use their original URLs"}
                       </FormDescription>
                     </div>
@@ -137,6 +107,33 @@ const Settings = () => {
                         }}
                       />
                     </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="linkShortenerService"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Link Shortener Service</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a service" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="gplinks">GPLinks</SelectItem>
+                        <SelectItem value="bitly">Bitly</SelectItem>
+                        <SelectItem value="tinyurl">TinyURL</SelectItem>
+                        <SelectItem value="isgd">Is.gd</SelectItem>
+                        <SelectItem value="cuttly">Cuttly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose which service to use for shortening links
+                    </FormDescription>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

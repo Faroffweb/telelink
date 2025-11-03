@@ -81,6 +81,7 @@ export type Database = {
           created_at: string
           enable_link_shortener: boolean
           id: string
+          link_shortener_service: string
           updated_at: string
           user_id: string
         }
@@ -88,6 +89,7 @@ export type Database = {
           created_at?: string
           enable_link_shortener?: boolean
           id?: string
+          link_shortener_service?: string
           updated_at?: string
           user_id: string
         }
@@ -95,6 +97,7 @@ export type Database = {
           created_at?: string
           enable_link_shortener?: boolean
           id?: string
+          link_shortener_service?: string
           updated_at?: string
           user_id?: string
         }
