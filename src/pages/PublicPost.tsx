@@ -72,7 +72,7 @@ const PublicPost = () => {
   };
 
   const isShortened = (url: string) => {
-    return url.includes('gplinks.com') || url.includes('gplnk.com');
+    return url.includes('gplinks.com') || url.includes('gplnk.com') || url.includes('mdiskshortner.link');
   };
 
   if (loading) {

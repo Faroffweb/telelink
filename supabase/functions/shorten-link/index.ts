@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { url } = await req.json();
+    const { url, service = 'gplinks' } = await req.json();
 
     if (!url) {
       return new Response(
@@ -21,26 +21,51 @@ serve(async (req) => {
       );
     }
 
-    const apiKey = Deno.env.get('GPLINKS_API_KEY');
-    if (!apiKey) {
-      console.error('GPLINKS_API_KEY not configured');
-      return new Response(
-        JSON.stringify({ error: 'Link shortener not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    console.log('Shortening URL:', url, 'using service:', service);
+
+    let apiKey: string | undefined;
+    let apiUrl: string;
+
+    // Select API based on service
+    switch (service) {
+      case 'gplinks':
+        apiKey = Deno.env.get('GPLINKS_API_KEY');
+        if (!apiKey) {
+          console.error('GPLINKS_API_KEY not configured');
+          return new Response(
+            JSON.stringify({ error: 'GPLinks not configured' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        apiUrl = `https://api.gplinks.com/api?api=${apiKey}&url=${encodeURIComponent(url)}`;
+        break;
+
+      case 'mdiskshortner':
+        apiKey = Deno.env.get('MDISKSHORTNER_API_KEY');
+        if (!apiKey) {
+          console.error('MDISKSHORTNER_API_KEY not configured');
+          return new Response(
+            JSON.stringify({ error: 'MDisk Shortner not configured' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        apiUrl = `https://mdiskshortner.link/api?api=${apiKey}&url=${encodeURIComponent(url)}`;
+        break;
+
+      default:
+        return new Response(
+          JSON.stringify({ error: `Unsupported service: ${service}` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
     }
 
-    console.log('Shortening URL:', url);
-
-    // Call GPLinks API to shorten the link (correct endpoint: api.gplinks.com)
-    const apiUrl = `https://api.gplinks.com/api?api=${apiKey}&url=${encodeURIComponent(url)}`;
-    console.log('Calling GPLinks API:', apiUrl);
+    console.log('Calling API:', apiUrl);
     
     const response = await fetch(apiUrl);
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('GPLinks API error:', response.status, errorText);
+      console.error(`${service} API error:`, response.status, errorText);
       return new Response(
         JSON.stringify({ error: 'Failed to shorten link' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -48,15 +73,24 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('GPLinks response:', data);
+    console.log(`${service} response:`, data);
 
-    if (data.status === 'success' && data.shortenedUrl) {
+    // Handle response based on service
+    let shortenedUrl: string | null = null;
+    
+    if (service === 'gplinks' && data.status === 'success' && data.shortenedUrl) {
+      shortenedUrl = data.shortenedUrl;
+    } else if (service === 'mdiskshortner' && data.shortenedUrl) {
+      shortenedUrl = data.shortenedUrl;
+    }
+
+    if (shortenedUrl) {
       return new Response(
-        JSON.stringify({ shortenedUrl: data.shortenedUrl }),
+        JSON.stringify({ shortenedUrl }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } else {
-      console.error('GPLinks unexpected response:', data);
+      console.error(`${service} unexpected response:`, data);
       return new Response(
         JSON.stringify({ error: data.message || 'Failed to shorten link' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

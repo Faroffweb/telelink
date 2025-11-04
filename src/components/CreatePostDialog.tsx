@@ -30,6 +30,7 @@ const CreatePostDialog = ({ open, onOpenChange, onPostCreated }: CreatePostDialo
   const [links, setLinks] = useState<Link[]>([{ button_name: "", url: "" }]);
   const [loading, setLoading] = useState(false);
   const [linkShortenerEnabled, setLinkShortenerEnabled] = useState(false);
+  const [linkShortenerService, setLinkShortenerService] = useState<string>("gplinks");
 
   useEffect(() => {
     if (open) {
@@ -44,12 +45,13 @@ const CreatePostDialog = ({ open, onOpenChange, onPostCreated }: CreatePostDialo
 
       const { data: settings } = await supabase
         .from("user_settings")
-        .select("enable_link_shortener")
+        .select("enable_link_shortener, link_shortener_service")
         .eq("user_id", user.id)
         .single();
 
       if (settings) {
         setLinkShortenerEnabled(settings.enable_link_shortener);
+        setLinkShortenerService(settings.link_shortener_service || "gplinks");
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -59,7 +61,7 @@ const CreatePostDialog = ({ open, onOpenChange, onPostCreated }: CreatePostDialo
   const shortenLink = async (url: string): Promise<string> => {
     try {
       const { data, error } = await supabase.functions.invoke('shorten-link', {
-        body: { url }
+        body: { url, service: linkShortenerService }
       });
 
       if (error) throw error;

@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 const formSchema = z.object({
   enableLinkShortener: z.boolean().default(false),
-  linkShortenerService: z.enum(["gplinks", "bitly", "tinyurl", "isgd", "cuttly"]),
+  linkShortenerService: z.enum(["gplinks", "bitly", "tinyurl", "isgd", "cuttly", "mdiskshortner"]),
 });
 
 const Settings = () => {
@@ -128,6 +128,7 @@ const Settings = () => {
                         <SelectItem value="tinyurl">TinyURL</SelectItem>
                         <SelectItem value="isgd">Is.gd</SelectItem>
                         <SelectItem value="cuttly">Cuttly</SelectItem>
+                        <SelectItem value="mdiskshortner">MDisk Shortner</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormDescription>
