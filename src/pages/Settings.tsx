@@ -75,6 +75,20 @@ const Settings = () => {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="grid gap-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center p-8">
+              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-6">
       <Card>
