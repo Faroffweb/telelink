@@ -115,9 +115,30 @@ const Settings = () => {
                     <FormControl>
                       <Switch
                         checked={field.value}
-                        onCheckedChange={(checked) => {
+                        onCheckedChange={async (checked) => {
                           field.onChange(checked);
-                          toast.info(checked ? "Link shortener enabled" : "Link shortener disabled");
+                          // Auto-save the setting
+                          try {
+                            const { data: { user } } = await supabase.auth.getUser();
+                            if (!user) return;
+
+                            const { error } = await supabase
+                              .from("user_settings")
+                              .upsert({
+                                user_id: user.id,
+                                enable_link_shortener: checked,
+                                link_shortener_service: form.getValues("linkShortenerService"),
+                              }, {
+                                onConflict: "user_id"
+                              });
+
+                            if (error) throw error;
+                            toast.success(checked ? "Link shortener enabled" : "Link shortener disabled");
+                          } catch (error) {
+                            console.error("Error saving setting:", error);
+                            toast.error("Failed to save setting");
+                            field.onChange(!checked); // Revert on error
+                          }
                         }}
                       />
                     </FormControl>
@@ -130,7 +151,33 @@ const Settings = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Link Shortener Service</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select 
+                      onValueChange={async (value) => {
+                        field.onChange(value);
+                        // Auto-save the setting
+                        try {
+                          const { data: { user } } = await supabase.auth.getUser();
+                          if (!user) return;
+
+                          const { error } = await supabase
+                            .from("user_settings")
+                            .upsert({
+                              user_id: user.id,
+                              enable_link_shortener: form.getValues("enableLinkShortener"),
+                              link_shortener_service: value,
+                            }, {
+                              onConflict: "user_id"
+                            });
+
+                          if (error) throw error;
+                          toast.success("Service updated");
+                        } catch (error) {
+                          console.error("Error saving setting:", error);
+                          toast.error("Failed to save setting");
+                        }
+                      }} 
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a service" />
