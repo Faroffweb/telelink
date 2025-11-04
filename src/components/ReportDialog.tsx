@@ -53,21 +53,24 @@ const ReportDialog = ({ postId, linkId }: ReportDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full">
+        <Button 
+          variant="outline" 
+          className="w-full bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/50 transition-all"
+        >
           <AlertTriangle className="mr-2 h-4 w-4" />
           Report Broken Link
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-gray-800 border-gray-700">
         <DialogHeader>
-          <DialogTitle>Report Broken Link</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-white">Report Broken Link</DialogTitle>
+          <DialogDescription className="text-gray-400">
             Let us know if you found a broken or incorrect link
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="comment">Comment *</Label>
+            <Label htmlFor="comment" className="text-gray-200">Comment *</Label>
             <Textarea
               id="comment"
               placeholder="Describe the issue with the link..."
@@ -75,19 +78,25 @@ const ReportDialog = ({ postId, linkId }: ReportDialogProps) => {
               onChange={(e) => setComment(e.target.value)}
               required
               rows={4}
+              className="bg-gray-900 border-gray-700 text-white placeholder:text-gray-500"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email (optional)</Label>
+            <Label htmlFor="email" className="text-gray-200">Email (optional)</Label>
             <Input
               id="email"
               type="email"
               placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="bg-gray-900 border-gray-700 text-white placeholder:text-gray-500"
             />
           </div>
-          <Button type="submit" disabled={loading} className="w-full">
+          <Button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white"
+          >
             {loading ? "Submitting..." : "Submit Report"}
           </Button>
         </form>

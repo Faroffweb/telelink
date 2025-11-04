@@ -162,7 +162,7 @@ const Reports = () => {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => window.open(`/${report.posts.slug}`, "_blank")}
+                    onClick={() => window.open(`/post/${report.posts.slug}`, "_blank")}
                   >
                     View Post
                   </Button>
