@@ -155,9 +155,21 @@ const Dashboard = () => {
                                 You can create new posts, manage your links, and view your public profile.
                                 Get started by creating a new post or managing your links.
                             </p>
-                            <Button variant="link" className="px-0 mt-4" onClick={() => setActiveView("links")}>
-                                Manage Links <ArrowRight className="h-4 w-4 ml-2" />
-                            </Button>
+                            <div className="flex gap-3 mt-4">
+                                <Button variant="link" className="px-0" onClick={() => setActiveView("links")}>
+                                    Manage Links <ArrowRight className="h-4 w-4 ml-2" />
+                                </Button>
+                                {isAdmin && (
+                                    <Button 
+                                        variant="outline" 
+                                        className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20"
+                                        onClick={() => setActiveView("reports")}
+                                    >
+                                        <MessageSquare className="h-4 w-4 mr-2" />
+                                        View All Reports
+                                    </Button>
+                                )}
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
