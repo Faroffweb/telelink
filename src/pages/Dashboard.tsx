@@ -140,29 +140,39 @@ const Dashboard = () => {
         <main className="container mx-auto px-4 py-8">
             {activeView === 'dashboard' && (
                 <div className="grid gap-8">
-                    <Card className="shadow-sm hover:shadow-md transition-shadow">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-2xl">
-                                <LayoutDashboard className="h-6 w-6" />
+                    <Card className="border-2 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-card/50">
+                        <CardHeader className="space-y-3 pb-6">
+                            <CardTitle className="flex items-center gap-3 text-3xl">
+                                <div className="p-2 bg-primary/10 rounded-lg">
+                                    <LayoutDashboard className="h-7 w-7 text-primary" />
+                                </div>
                                 Welcome to your Dashboard
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-base">
                                 This is your central hub for managing your content and links.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                You can create new posts, manage your links, and view your public profile.
-                                Get started by creating a new post or managing your links.
-                            </p>
-                            <div className="flex gap-3 mt-4">
-                                <Button variant="link" className="px-0" onClick={() => setActiveView("links")}>
-                                    Manage Links <ArrowRight className="h-4 w-4 ml-2" />
+                        <CardContent className="space-y-6">
+                            <div className="p-4 rounded-lg bg-muted/30 border">
+                                <p className="text-muted-foreground leading-relaxed">
+                                    You can create new posts, manage your links, and view your public profile.
+                                    Get started by creating a new post or managing your links.
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap gap-4 pt-2">
+                                <Button 
+                                    variant="default" 
+                                    className="shadow-md"
+                                    onClick={() => setActiveView("links")}
+                                >
+                                    <LinkIcon className="h-4 w-4 mr-2" />
+                                    Manage Links
+                                    <ArrowRight className="h-4 w-4 ml-2" />
                                 </Button>
                                 {isAdmin && (
                                     <Button 
                                         variant="outline" 
-                                        className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20"
+                                        className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20 shadow-md"
                                         onClick={() => setActiveView("reports")}
                                     >
                                         <MessageSquare className="h-4 w-4 mr-2" />
