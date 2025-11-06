@@ -192,7 +192,10 @@ const Dashboard = () => {
         <CreatePostDialog
             open={showCreateDialog}
             onOpenChange={setShowCreateDialog}
-            onPostCreated={() => {}}
+            onPostCreated={() => {
+              setShowCreateDialog(false);
+              window.location.reload();
+            }}
         />
       </SidebarInset>
     </SidebarProvider>

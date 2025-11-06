@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
-import { Shield, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Shield, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import PostCard from "@/components/PostCard";
 
@@ -16,6 +17,8 @@ const LinkSection = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 9;
 
   useEffect(() => {
     fetchPosts();
@@ -45,6 +48,17 @@ const LinkSection = () => {
     post.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const endIndex = startIndex + postsPerPage;
+  const currentPosts = filteredPosts.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
         <div className="relative">
@@ -71,11 +85,51 @@ const LinkSection = () => {
                 <p className="text-muted-foreground">Create your first post to see it here.</p>
             </div>
         ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredPosts.map((post) => (
-                <PostCard key={post.id} post={post} onDelete={handlePostDeleted} />
-                ))}
-            </div>
+            <>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {currentPosts.map((post) => (
+                    <PostCard key={post.id} post={post} onDelete={handlePostDeleted} />
+                    ))}
+                </div>
+
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-8">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            <ChevronLeft className="h-4 w-4 mr-1" />
+                            Previous
+                        </Button>
+                        
+                        <div className="flex items-center gap-2">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                <Button
+                                    key={page}
+                                    variant={currentPage === page ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setCurrentPage(page)}
+                                    className="min-w-[40px]"
+                                >
+                                    {page}
+                                </Button>
+                            ))}
+                        </div>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                        >
+                            Next
+                            <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                    </div>
+                )}
+            </>
         )}
     </div>
   );
