@@ -149,6 +149,7 @@ export type Database = {
         Row: {
           created_at: string
           enable_link_shortener: boolean
+          how_to_download_link: string | null
           id: string
           link_shortener_service: string
           updated_at: string
@@ -157,6 +158,7 @@ export type Database = {
         Insert: {
           created_at?: string
           enable_link_shortener?: boolean
+          how_to_download_link?: string | null
           id?: string
           link_shortener_service?: string
           updated_at?: string
@@ -165,6 +167,7 @@ export type Database = {
         Update: {
           created_at?: string
           enable_link_shortener?: boolean
+          how_to_download_link?: string | null
           id?: string
           link_shortener_service?: string
           updated_at?: string

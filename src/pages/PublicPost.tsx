@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, ExternalLink, Link2 } from "lucide-react";
+import { Shield, ExternalLink, Link2, Download } from "lucide-react";
 import { toast } from "sonner";
 import ReportDialog from "@/components/ReportDialog";
 
@@ -25,10 +25,31 @@ const PublicPost = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(true);
+  const [howToDownloadLink, setHowToDownloadLink] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPost();
+    fetchHowToDownloadLink();
   }, [slug]);
+
+  const fetchHowToDownloadLink = async () => {
+    try {
+      // Fetch from any user's settings (assuming it's a global setting)
+      const { data } = await supabase
+        .from("user_settings")
+        .select("how_to_download_link")
+        .not("how_to_download_link", "is", null)
+        .limit(1)
+        .single();
+      
+      if (data?.how_to_download_link) {
+        setHowToDownloadLink(data.how_to_download_link);
+      }
+    } catch (error) {
+      // Silently fail if no link is configured
+      console.log("No how-to-download link configured");
+    }
+  };
 
   const fetchPost = async () => {
     try {
@@ -150,6 +171,19 @@ const PublicPost = () => {
         </Card>
 
         <div className="mt-8 space-y-4">
+          {howToDownloadLink && (
+            <div className="text-center">
+              <Button
+                onClick={() => handleLinkClick(howToDownloadLink)}
+                className="bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                size="lg"
+              >
+                <Download className="h-5 w-5 mr-2" />
+                How to Download
+              </Button>
+            </div>
+          )}
+          
           <div className="text-center">
             <Button
               onClick={() => handleLinkClick("https://telemovie.netlify.app/")}

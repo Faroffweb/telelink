@@ -2,6 +2,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,19 +10,23 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 const formSchema = z.object({
   enableLinkShortener: z.boolean().default(false),
   linkShortenerService: z.enum(["gplinks", "bitly", "tinyurl", "isgd", "cuttly", "mdiskshortner"]),
+  howToDownloadLink: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
 });
 
 const Settings = () => {
   const [loading, setLoading] = useState(true);
+  const { isAdmin } = useIsAdmin();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       enableLinkShortener: false,
       linkShortenerService: "gplinks",
+      howToDownloadLink: "",
     },
   });
 
@@ -43,6 +48,7 @@ const Settings = () => {
       if (settings) {
         form.setValue("enableLinkShortener", settings.enable_link_shortener);
         form.setValue("linkShortenerService", settings.link_shortener_service as any);
+        form.setValue("howToDownloadLink", settings.how_to_download_link || "");
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -62,6 +68,7 @@ const Settings = () => {
           user_id: user.id,
           enable_link_shortener: values.enableLinkShortener,
           link_shortener_service: values.linkShortenerService,
+          how_to_download_link: values.howToDownloadLink || null,
         }, {
           onConflict: "user_id"
         });
@@ -199,6 +206,30 @@ const Settings = () => {
                   </FormItem>
                 )}
               />
+              
+              {isAdmin && (
+                <FormField
+                  control={form.control}
+                  name="howToDownloadLink"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>How to Download Link (Admin Only)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="https://example.com/how-to-download" 
+                          {...field}
+                          type="url"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        This link will appear as a "How to Download" button on all public post pages
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              
               <Button type="submit" disabled={loading}>Save Changes</Button>
             </form>
           </Form>
